@@ -13,6 +13,7 @@ def genarate_ip(bound = 2)
 end
 
 
+#remote scp with NET/SSH module
 def run(list) 
 	list.each do |host|
 		puts host
