@@ -1,3 +1,4 @@
-10.10.102.142 router 0
-10.10.102.144 nats   1
-# wait for more ips
+10.10.102.171   mysql_gateway           0
+10.10.102.172   mysql_node              0
+#for test
+
