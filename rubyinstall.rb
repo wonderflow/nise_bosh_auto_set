@@ -4,22 +4,23 @@ require 'rubygems'
 require 'net/ssh'
 require 'net/scp'
 
+def send_file(ssh,filename)
+  if File.exist?filename
+    ssh.scp.upload!(filename,'.')do|ch,name,sent,total|
+      print "\r#{name}: #{(sent.to_f * 100 / total.to_f).to_i}%"
+    end
+    puts "\nDone."
+  else
+    puts "ERROR: Don't have such File: #{filename}"
+  end
+end
 
 def remote_connect(host,user,password)
   Net::SSH.start(host,user,:password=>password) do |ssh|
     puts host+" connected."
-    if File.exist?'sources.list'
-      ssh.scp.upload!('sources.list','.')
-    else
-      puts "Error: Don't have File: sources.list!"
-      return
-    end
-    if File.exist?'rubyinstall.sh'
-      ssh.scp.upload!('rubyinstall.sh','.')
-    else
-      puts "Error: Don't have File: rubyinstall.sh!"
-      return
-    end
+    send_file ssh,'sources.list'
+    send_file ssh,'rubyinstall.sh'
+    send_file ssh,'ruby-1.9.3-p448.tar.gz'
     ssh.open_channel do |channel|
       channel.request_pty do |ch,success|
         raise "I can't get pty request " unless success
@@ -37,5 +38,5 @@ def remote_connect(host,user,password)
   end
 end 
 
-remote_connect('10.10.102.151','vcap',"password")
+remote_connect('10.10.102.153','vcap',"password")
 

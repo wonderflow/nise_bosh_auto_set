@@ -1,1 +1,5 @@
 wonderflow-test
+*.gz
+*.tmp
+tmp.*
+tmp

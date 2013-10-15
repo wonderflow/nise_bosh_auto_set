@@ -9,8 +9,9 @@ if [ ! `which gcc` ]; then
   if [ `ls | grep sources.list` ]; then
     sudo cp sources.list /etc/apt/sources.list
     sudo apt-get update
+    rm sources.list
   fi
-  sudo apt-get install -y gcc
+  sudo DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install gcc
 fi
 
 
@@ -18,9 +19,14 @@ INSTALLER_URL=${INSTALLER_URL:-http://cache.ruby-lang.org/pub/ruby/1.9/ruby-1.9.
 
 source /etc/environment
 
+if [ ! `ls | grep ruby-1.9.3-p448.tar.gz` ]; then
+  sudo wget ${INSTALLER_URL}
+fi
+
+sudo cp ruby-1.9.3-p448.tar.gz /usr/src/
+
 cd /usr/src
 if [ ! -d ruby-1.9.3-p448 ]; then
-  sudo wget ${INSTALLER_URL}
   sudo tar xvzf ruby-1.9.3-p448.tar.gz
 fi
 
