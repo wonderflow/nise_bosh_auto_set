@@ -1,18 +1,11 @@
 #!/bin/bash
 
 # !!! something important about permission!!!
- 
-if ! (which wget); then
-  sudo apt-get update
-  sudo apt-get install -y wget
-fi
+
 
 if [ ! `which gcc` ]; then
   if [ `ls | grep sources.list` ]; then
     sudo cp sources.list /etc/apt/sources.list
-if [ ! `ls | grep ruby-1.9.3-p448.tar.gz` ]; then
-  sudo wget ${INSTALLER_URL}
-fi
     sudo apt-get update
     rm sources.list
   fi
@@ -21,40 +14,45 @@ fi
 
 sudo apt-get -y install build-essential libssl-dev libreadline-gplv2-dev zlib1g-dev git-core libxslt-dev libxml2-dev
 
-sudo cp yaml-0.1.4.tar.gz /usr/src
-sudo cp ruby-1.9.3-p448.tar.gz /usr/src
-sudo cp rubygems-1.8.17.tgz /usr/src
+sudo mkdir -p /var/vcap/bosh
+sudo mkdir -p /var/vcap/packages
+sudo mkdir -p /var/vcap/jobs
+
+sudo cp yaml-0.1.4.tar.gz /var/vcap/packages
+sudo cp ruby-1.9.3-p448.tar.gz /var/vcap/packages
+sudo cp rubygems-1.8.17.tgz /var/vcap/packages
 
 
 #yaml install
-cd /usr/src
+cd /var/vcap/packages
 sudo tar xzf yaml-0.1.4.tar.gz
 cd yaml-0.1.4
-sudo ./configure --prefix=/usr/local
-sudo make 
+sudo ./configure --prefix=/var/vcap/bosh
+sudo make
 sudo make install
+export PATH=/var/vcap/bosh/bin:$PATH
 
 #ruby install
-INSTALLER_URL=${INSTALLER_URL:-http://cache.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p448.tar.gz}
-source /etc/environment
 
-cd /usr/src
+cd /var/vcap/packages
 if [ ! -d ruby-1.9.3-p448 ]; then
   sudo tar xzf ruby-1.9.3-p448.tar.gz
 fi
 
 cd ruby-1.9.3-p448
 if ! (which ruby); then
-  sudo ./configure --prefix=/usr/local --enable-shared --disable-install-doc --with-opt-dir=/usr/local/lib --with-openssl-dir=/usr --with-readline-dir=/usr --with-zlib-dir=/usr
+  sudo ./configure --prefix=/var/vcap/bosh --enable-shared --disable-install-doc --with-opt-dir=/usr/local/lib --with-openssl-dir=/usr --with-readline-dir=/usr --with-zlib-dir=/usr
   sudo make
   sudo make install
 fi
+export PATH=/var/vcap/bosh/bin:$PATH
 
 #rubygems install
-cd /usr/src 
+cd /var/vcap/packages
 sudo tar xzf rubygems-1.8.17.tgz
 cd rubygems-1.8.17
 sudo ruby setup.rb
+export PATH=/var/vcap/bosh/bin:$PATH
 
 #set blob files
 cd /home/vcap
