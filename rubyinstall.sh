@@ -1,25 +1,30 @@
 #!/bin/bash
 
 # !!! something important about permission!!!
- 
-if ! (which wget); then
+if [ `ls | grep sources.list` ]; then
+  sudo cp sources.list /etc/apt/sources.list
   sudo apt-get update
-  sudo apt-get install -y wget
+  rm sources.list
 fi
+ 
+#set blob files
+cd /home/vcap
+echo "\nstart to tar adeploy.gz. it may take time..."
+tar xzf adeploy.gz
+mkdir vcap
+mv  /home/vcap/adeploy/deploy /home/vcap/vcap/
+sudo mv  /home/vcap/adeploy/vcap /var
+
+#Nise BOSH init
+cd /home/vcap/vcap/deploy/nise_bosh
+sudo ./bin/init
 
 if [ ! `which gcc` ]; then
-  if [ `ls | grep sources.list` ]; then
-    sudo cp sources.list /etc/apt/sources.list
-if [ ! `ls | grep ruby-1.9.3-p448.tar.gz` ]; then
-  sudo wget ${INSTALLER_URL}
-fi
-    sudo apt-get update
-    rm sources.list
-  fi
   sudo DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install gcc
+  #sudo DEBIAN_FRONTEND=noninteractive apt-get install -f -y --force-yes --no-install-recommends gcc
 fi
 
-sudo apt-get -y install build-essential libssl-dev libreadline-gplv2-dev zlib1g-dev git-core libxslt-dev libxml2-dev
+sudo apt-get -y install build-essential libssl-dev libreadline-gplv2-dev zlib1g-dev libxslt-dev libxml2-dev git-core
 
 sudo cp yaml-0.1.4.tar.gz /usr/src
 sudo cp ruby-1.9.3-p448.tar.gz /usr/src
@@ -49,16 +54,14 @@ fi
 
 #rubygems install
 cd /usr/src 
-sudo tar xzf rubygems-1.8.17.tgz
+sudo tar xzf rubygems-1.8.17.tgzsudo cd /home/vcap
+sudo mkdir vcap
+sudo mv -r /home/vcap/adeploy/deploy /home/vcap/vcap/
+sudo mv -r /home/vcap/adeploy/vcap /var
+
 cd rubygems-1.8.17
 sudo ruby setup.rb
 
-#set blob files
-cd /home/vcap
-tar xzf adeploy.gz
-mkdir vcap
-mv  /home/vcap/adeploy/deploy /home/vcap/vcap/
-sudo mv  /home/vcap/adeploy/vcap /var
 
 
 #install gem packages

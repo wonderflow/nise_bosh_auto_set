@@ -69,20 +69,13 @@ def remote_connect(host,user,password)
   Net::SSH.start(host,user,:password=>password) do |ssh|
     puts host+" connected."
     send_all ssh
-    #exec_install ssh,log_file
+    exec_install ssh,log_file
   end
   log_file.close
 end 
 
 list = []
-#list << "10.10.102.154"
-#list << "10.10.102.155"
-#list << "10.10.102.156"
 list << "10.10.102.150"
-list << "10.10.102.151"
-list << "10.10.102.152"
-list << "10.10.102.153"
-list << "10.10.102.154"
 
 thread = []
 
