@@ -24,7 +24,9 @@ if [ ! `which gcc` ]; then
   #sudo DEBIAN_FRONTEND=noninteractive apt-get install -f -y --force-yes --no-install-recommends gcc
 fi
 
-sudo apt-get -y install build-essential libssl-dev libreadline-gplv2-dev zlib1g-dev libxslt-dev libxml2-dev git-core
+sudo apt-get -y install build-essential libssl-dev libreadline5-dev zlib1g-dev libxslt-dev libxml2-dev git-core
+
+cd /home/vcap
 
 sudo cp yaml-0.1.4.tar.gz /usr/src
 sudo cp ruby-1.9.3-p448.tar.gz /usr/src

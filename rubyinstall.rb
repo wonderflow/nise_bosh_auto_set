@@ -69,7 +69,7 @@ def remote_connect(host,user,password)
   Net::SSH.start(host,user,:password=>password) do |ssh|
     puts host+" connected."
     send_all ssh
-    exec_install ssh,log_file
+    #exec_install ssh,log_file
   end
   log_file.close
 end 
