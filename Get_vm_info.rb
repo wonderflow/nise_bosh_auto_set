@@ -20,7 +20,7 @@ def remote_connect(host,user,password)
     ssh.open_channel do |channel|
       channel.request_pty do |ch,success|
         raise "I can't get pty request " unless success
-        ch.exec('sudo bash get_info.sh')
+        ch.exec('sudo bash Get_vm_info.sh')
         ch.on_data do |ch,data|
           data.inspect
           if data.inspect.include?"[sudo]"
