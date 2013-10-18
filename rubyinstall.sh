@@ -35,9 +35,6 @@ sudo make
 sudo make install
 
 #ruby install
-INSTALLER_URL=${INSTALLER_URL:-http://cache.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p448.tar.gz}
-source /etc/environment
-
 cd /usr/src
 if [ ! -d ruby-1.9.3-p448 ]; then
   sudo tar xzf ruby-1.9.3-p448.tar.gz
