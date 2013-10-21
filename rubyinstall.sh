@@ -11,9 +11,12 @@ fi
 cd /home/vcap
 echo "\nstart to tar adeploy.gz. it may take time..."
 tar xzf adeploy.gz
+
+echo "move files"
 mkdir vcap
 mv  /home/vcap/adeploy/deploy /home/vcap/vcap/
 sudo mv  /home/vcap/adeploy/vcap /var
+rmdir adeploy
 
 #Nise BOSH init
 cd /home/vcap/vcap/deploy/nise_bosh
@@ -56,10 +59,7 @@ fi
 
 #rubygems install
 cd /usr/src 
-sudo tar xzf rubygems-1.8.17.tgzsudo cd /home/vcap
-sudo mkdir vcap
-sudo mv -r /home/vcap/adeploy/deploy /home/vcap/vcap/
-sudo mv -r /home/vcap/adeploy/vcap /var
+sudo tar xzf rubygems-1.8.17.tgz
 
 cd rubygems-1.8.17
 sudo ruby setup.rb
@@ -69,11 +69,13 @@ sudo ruby setup.rb
 #install gem packages
 sudo gem install bundler
 sudo gem install rake
+sudo gem install bosh_cli
 
 #get gem dependent files
 cd /home/vcap/vcap/deploy/nise_bosh/
 bundle install
+
+cd /var/vcap/packages/cloud_agent/
+bundle install
 #ERROR,solution
 
-#install bosh
-sudo gem install bosh_cli

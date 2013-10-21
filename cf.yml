@@ -142,7 +142,7 @@ jobs:
 
 properties:
 
-  domain: test.com
+  domain: cf.local
 
   networks:
     apps: default
@@ -151,11 +151,11 @@ properties:
   nats:
     user: nats
     password: nats
-    address: 10.10.102.150
+    address: 10.10.102.163
     port: 4222
 
   ccdb:
-    address: 10.10.102.151
+    address: 10.10.102.153
     port: 5524
     pool_size: 10
     roles:
@@ -167,7 +167,7 @@ properties:
       name: appcloud
 
   uaadb:
-    address: 192.168.1.11
+    address: 10.10.102.154
     port: 2544
     roles:
     - tag: admin
@@ -179,7 +179,7 @@ properties:
  #for install uaadb or ccdb ,add the line below
  # db: uaadb/ccdb
   cc:
-    srv_api_uri: http://api.test.com
+    srv_api_uri: http://api.cf.local
     password: zbTuuLaap44jadlas2l312lk
     token: 267f4eaa8c1758f66d5cb7adcb24adb9d7
     use_nginx: true
@@ -197,7 +197,7 @@ properties:
     - zjuvlis@zju.edu.cn
 
   vcap_redis:
-    address: 10.10.101.150
+    address: 10.10.102.155
     port: 5454
     password: PoIxbL98RWpwBuUJvKNojnpIcRb1ot2
     maxmemory: 20000000 # 200MB
@@ -219,11 +219,11 @@ properties:
     max_memory: 4096
 
   nfs_server:
-    address: 10.10.101.159
-    network: 192.168.1.0/24
+    address: 10.10.102.150
+    network: 10.10.102.0/24
 
   hbase_master:
-    address: 192.168.1.12
+    address: 10.10.102.170
     hbase_master:
       port: 60000
       webui_port: 60010
@@ -234,7 +234,7 @@ properties:
       port: 9000
 
   opentsdb:
-    address: 10.10.101.154
+    address: 10.10.102.160
     port: 4242
 
   hbase_slave:
@@ -242,7 +242,7 @@ properties:
       port: 60020
       heap_size: 1024
     addresses:
-    - 10.10.101.155
+    - 10.10.102.171
 
   plan: "100"
 
@@ -421,7 +421,7 @@ properties:
     default_version: "9.1"
 
   syslog_aggregator:
-    address: 10.10.101.153
+    address: 10.10.102.151
     port: 54321
 
   stager:
@@ -432,13 +432,13 @@ properties:
 
   login:
     links:
-      home: https://portal.test.com
-      passwd: https://portal.test.com/password_resets/new
-      signup: https://portal.test.com/register
+      home: https://portal.cf.local
+      passwd: https://portal.cf.local/password_resets/new
+      signup: https://portal.cf.local/register
 
   uaa:
     catalina_opts: -Xmx768m -XX:MaxPermSize=256m
-    url: http://uaa.test.com
+    url: http://uaa.cf.local
     resource_id: account_manager
     client_secret: somesecret
     token_secret: tokensecret

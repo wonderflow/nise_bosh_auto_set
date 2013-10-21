@@ -47,7 +47,7 @@ def exec_install(ssh,log)
   ssh.open_channel do |channel|
     channel.request_pty do |ch,success|
       raise "I can't get pty request " unless success
-      ch.exec('sudo bash rubyinstall.sh')
+      ch.exec('bash rubyinstall.sh')
       ch.on_data do |ch,data|
         data.inspect
         if data.inspect.include?"[sudo]" 
@@ -69,13 +69,13 @@ def remote_connect(host,user,password)
   Net::SSH.start(host,user,:password=>password) do |ssh|
     puts host+" connected."
     send_all ssh
-    #exec_install ssh,log_file
+    exec_install ssh,log_file
   end
   log_file.close
 end 
 
 list = []
-list << "10.10.102.150"
+list << "10.10.102.177"
 
 thread = []
 
