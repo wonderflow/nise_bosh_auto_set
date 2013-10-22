@@ -26,13 +26,13 @@ end
 
 def send_all(ssh)
   files = []
-  files << "sources.list"
-  files << "rubyinstall.sh"
+  files << File.join('config','sources.list')
+  files << File.join('shell','rubyinstall.sh')
   blobs = []
-  blobs << "blobs/ruby-1.9.3-p448.tar.gz"
-  blobs << "blobs/rubygems-1.8.17.tgz"
-  blobs << "blobs/yaml-0.1.4.tar.gz"
-  blobs << "adeploy.gz"
+  blobs << File.join('blobs','ruby-1.9.3-p448.tar.gz')
+  blobs << File.join('blobs','rubygems-1.8.17.tgz')
+  blobs << File.join('blobs','yaml-0.1.4.tar.gz')
+  blobs << File.join('blobs','adeploy.gz')
   #send some files
   files.each do |f|
     send_file(ssh,f)
