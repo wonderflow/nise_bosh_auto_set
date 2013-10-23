@@ -36,11 +36,31 @@ def remote_connect(host,user,password)
   end
   file.close
 end
+def read_file(filename)
+  a = Array.new
+  File.open(filename,"r") do |file|
+    while line = file.gets
+      b = []
+      while(file.lineno%4!=0)
+        b = b.push(line)
+        line = file.gets
+      end
+      b = b.push line
+      a = a.push b
+    end
+  end
+  a.each {|x| p x}
+end
+
 
 list = []
-list << "10.10.102.165"
-list << "10.10.102.163"
+list << "10.10.102.166"
+list << "10.10.102.167"
 
 list.each do |host|
     remote_connect(host,'vcap',"password")
 end
+
+`cat ips | grep -v ^$ >ips2`
+
+read_file("ips2")
