@@ -49,7 +49,7 @@ def read_file(filename)
       a = a.push b
     end
   end
-  a.each {|x| p x}
+  a.each {|x| p x.join("---")}
 end
 
 
