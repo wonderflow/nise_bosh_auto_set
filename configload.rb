@@ -1,7 +1,7 @@
 #!/home/sun/.rvm/rubies/ruby-1.9.3-p448/bin/ruby
 
 require 'yaml'
-class Config
+class NiseConfig
 
   def load_yml(file)
     return YAML::load_file(file)
@@ -58,24 +58,31 @@ class Config
     }
   end
 
+  #cfyml name : jobname_index_cf
   def cf_yml_file_generate(cf,ip)
     exchange cf,ip
     ip.keys.each do |key|
       if key == 'domain' then next end
-      if ip[key].size>1
+      if key == 'uaadb'
+        cf['properties']['db'] = 'uaadb'
+      end
+      if key == 'ccdb'
+        cf['properties']['db'] = 'ccdb'
+      end
+      ip[key].each_with_index do |ipp,index|
         if cf['properties'].keys.inspect.include? key
-          ip[key].each_with_index do |ipp,i|
-            cf['properties'][key]['address'] = ipp
-            output cf,'cfyml',key+"_"+i.to_s
-          end
+          cf['properties'][key]['address'] = ipp
         end
-      else
-        output cf,'cfyml',key+"_0"
+        output cf,'cfyml',key+"_"+index.to_s+"_cf"
       end
     end
+    puts "generate all jobs cf.yml complete."
   end
 
+  #cloudagentyml name: jobname_index_cloud
   def cloud_yml_file_generate(cloudagent,ip)
+    #NOTICE: nats and zkper only have one and choose the first ip 
+    #        write into the cloudagent yml
     nats = ip['nats'][0].chomp
     zkper = ip['zkper'][0].chomp
     ip.keys.each do |key|
@@ -85,9 +92,22 @@ class Config
         cloudagent['zkp_url'] = zkper+":2181"
         cloudagent['job'] = key
         cloudagent['job_index'] = i
-        output cloudagent,'cloudagentyml',key+"_"+i.to_s
+        output cloudagent,'cloudagentyml',key+"_"+i.to_s+"_cloud"
       end
     end
+    puts "generate all jobs cloudagent.yml complete."
+  end
+
+  def shell_generate(iptable)
+    iptable.keys.each do |key|
+      if key == 'domain' then next end
+      File.open(File.join('shell','jobs',key+".sh"),'w+'){|f|
+        f.write("cd vcap/deploy/nise_bosh/\n") 
+        f.write("sudo bundle exec ./bin/nise-bosh ../cf-release/ ../cf.yml #{key}\n")
+        #TODO:cloudagent
+      }
+    end
+    puts "generate all jobs install.sh complete."
   end
 
   def work()
@@ -96,6 +116,8 @@ class Config
     cf_yml_file_generate cf_yml,iptable
     cloudagent_yml = load_yml File.join('config','cloud_agent.yml')
     cloud_yml_file_generate cloudagent_yml,iptable
+    shell_generate iptable
+    return iptable
   end
 
 end

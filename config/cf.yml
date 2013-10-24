@@ -177,7 +177,7 @@ properties:
     - tag: uaa
       name: uaa
  #for install uaadb or ccdb ,add the line below
- # db: uaadb/ccdb
+  db: uaadb/ccdb
   cc:
     srv_api_uri: http://api.cf.local
     password: zbTuuLaap44jadlas2l312lk

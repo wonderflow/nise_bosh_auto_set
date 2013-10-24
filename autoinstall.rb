@@ -4,12 +4,22 @@ require 'net/scp'
 
 class Install
 
-  def send_file(ssh,filename)
-    if File.exist?filename
-      ssh.scp.upload!(filename,'.')
-      return "#{filename} upload Done."
+  def initialize(job,index,host,user,password)
+    @job = job
+    @index = index
+    @host = host
+    @user = user
+    @password = password
+
+    @filename = @job+"_"+@index.to_s
+  end
+
+  def send_file(ssh,srcpath,despath)
+    if File.exist?srcpath
+      ssh.scp.upload!(srcpath,despath)
+      return "#{srcpath} upload Done."
     else
-      return "ERROR: Don't have such File: #{filename}"
+      return "ERROR: Don't have such File: #{srcpath}"
     end
   end
 
@@ -29,7 +39,10 @@ class Install
   def send_all(ssh)
     files = []
     files << File.join('config','sources.list')
-    files << File.join('shell','rubyinstall.sh')
+    files << File.join('shell','autoinstall.sh')
+    files << File.join('config','cfyml',@filename+"_cf.yml")
+    files << File.join('config','cloudagentyml',@filename+"_cloud.yml")
+    files << File.join('shell','jobs',@job+".sh")
     blobs = []
     blobs << File.join('blobs','ruby-1.9.3-p448.tar.gz')
     blobs << File.join('blobs','rubygems-1.8.17.tgz')
@@ -37,7 +50,7 @@ class Install
     blobs << File.join('blobs','adeploy.gz')
     #send some files
     files.each do |f|
-      send_file(ssh,f)
+      send_file(ssh,f,'.')
     end
     #send the important blob files
     blobs.each do |f|
@@ -45,11 +58,11 @@ class Install
     end
   end
 
-  def exec_install(ssh,log)
+  def exec(ssh,log,instructor)
     ssh.open_channel do |channel|
       channel.request_pty do |ch,success|
         raise "I can't get pty request " unless success
-        ch.exec('bash rubyinstall.sh')
+        ch.exec(instructor)
         ch.on_data do |ch,data|
           data.inspect
           if data.inspect.include?"[sudo]" 
@@ -66,18 +79,22 @@ class Install
 
   #connect remote vm and run logical things
   def remote_connect(host,user,password)
+    puts host
     filename = File.join("log",host+".log")
     log_file = File.open(filename,"w")
     Net::SSH.start(host,user,:password=>password) do |ssh|
       puts host+" connected."
       send_all ssh
-      exec_install ssh,log_file
+      exec ssh,log_file,"mv #{@filename+'_cf.yml'} /home/vcap/vcap/deploy/cf.yml"
+      exec ssh,log_file,"sudo mv #{@filename+'_cloud.yml'} /var/vcap/jobs/cloud_agent/config/cloud_agent.yml"
+      exec ssh,log_file,"bash autoinstall.sh"
+      exec ssh,log_file,"bash #{@filename+'.sh'}"
     end
     log_file.close
   end 
 
-  def work(host,user,password)
-    remote_connect(host,user,password)
+  def work()
+    remote_connect(@host,@user,@password)
   end
 
 end

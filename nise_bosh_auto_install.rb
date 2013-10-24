@@ -3,30 +3,29 @@
 $:.unshift File.dirname(__FILE__)
 
 require 'configload'
-require 'rubyinstall'
+require 'autoinstall'
 
 
-config = Config.new
-config.work
-
-install = Install.new
-
-
+threads = []
+installlist = []
+config = NiseConfig.new
+cf_yml = config.work
 
 
-list = []
-list << "10.10.102.177"
-
-thread = []
-
-
-list.each do |host|
-  thread << Thread.new do
-    remote_connect(host,'vcap',"password")
+cf_yml.keys.each do |key|
+  if key=='domain' then next end
+  cf_yml[key].each_with_index do |host,index|
+    installlist << Install.new(key,index,host,'vcap','password')
   end
 end
 
-thread.each do |x|
-  x.join
+installlist.each do |ins|
+  threads << Thread.new do
+    ins.work
+  end
+end
+
+threads.each do |thread|
+  thread.join
 end
 
