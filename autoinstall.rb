@@ -27,7 +27,10 @@ class Install
   def send_blobs(ssh,srcpath,despath)
     if File.exist?srcpath
       ssh.scp.upload!( srcpath , despath , :recursive => true )do|ch, name, sent, total|
-        print "\r#{name}: #{(sent.to_f * 100 / total.to_f).to_i}%"
+        percent = (sent.to_f*100 / total.to_f).to_i
+        if percent%5==0 
+          print "\r#{@host}: #{name}: #{percent}%"
+        end
       end
       print "\n"
       return "#{srcpath} upload Done."
@@ -50,11 +53,11 @@ class Install
     blobs << File.join('blobs','adeploy.gz')
     #send some files
     files.each do |f|
-      send_file(ssh,f,'.')
+      puts send_file(ssh,f,'.')
     end
     #send the important blob files
     blobs.each do |f|
-      send_blobs(ssh,f,'.')
+      puts send_blobs(ssh,f,'.')
     end
   end
 
@@ -79,12 +82,11 @@ class Install
 
   #connect remote vm and run logical things
   def remote_connect(host,user,password)
-    puts host
-    filename = File.join("log",host+".log")
-    log_file = File.open(filename,"w")
+    log_file = File.open(File.join("log",host+".log"),"w+")
     Net::SSH.start(host,user,:password=>password) do |ssh|
       puts host+" connected."
       send_all ssh
+      exec ssh,log_file,"bash env.sh"
       exec ssh,log_file,"mv #{@filename+'_cf.yml'} /home/vcap/vcap/deploy/cf.yml"
       exec ssh,log_file,"sudo mv #{@filename+'_cloud.yml'} /var/vcap/jobs/cloud_agent/config/cloud_agent.yml"
       exec ssh,log_file,"bash autoinstall.sh"

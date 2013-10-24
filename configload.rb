@@ -33,11 +33,14 @@ class NiseConfig
 
   def exchange(cf,ip)
     domain_change cf,ip['domain'][0]
-    #only one nats
-    c_ip = ['nats','ccdb','uaadb','uaadb','vcap_redis','nfs_server',\
+    # TODO:wait for change to avoid sturben
+    c_ip = ['nats','ccdb','uaadb','vcap_redis','nfs_server',\
             'hbase_master','opentsdb','syslog_aggregator']
     c_ip.each do |str|
-      #puts str
+      if ip[str] == nil
+        puts "warn : no component #{str}" 
+        next
+      end
       if str != 'nfs_server'
         cf['properties'][str]['address'] = ip[str][0]
       else
@@ -46,8 +49,13 @@ class NiseConfig
         cf['properties'][str]['network'] = network.sub(/\d+$/, '0/24')
       end
     end
+    # TODO:wait for change to avoid sturben
     c_ips = ['hbase_slave']
     c_ips.each do |str|
+      if ip[str] == nil 
+        puts "warn : no component #{str}" 
+        next
+      end
       cf['properties'][str]['addresses'][0] = ip[str][0]
     end
   end
@@ -81,10 +89,23 @@ class NiseConfig
 
   #cloudagentyml name: jobname_index_cloud
   def cloud_yml_file_generate(cloudagent,ip)
-    #NOTICE: nats and zkper only have one and choose the first ip 
+    # TODO: nats and zkper only have one and choose the first ip 
     #        write into the cloudagent yml
-    nats = ip['nats'][0].chomp
-    zkper = ip['zkper'][0].chomp
+    if ip['nats'] == nil
+      puts "ERROR : you don't give nats config! "
+      # TODO : need to delete below line and error exit
+      nats = '10.10.102.150'
+    else
+      nats = ip['nats'][0].chomp
+    end
+    if ip['zkper'] == nil
+      puts "ERROR : you don't give zkper config! "
+      # TODO : need to delete below line and error exit
+      zkper = '10.10.102.150'
+    else
+      zkper = ip['zkper'][0].chomp
+    end
+
     ip.keys.each do |key|
       if key == 'domain' then next end
       ip[key].each_with_index do |ipp,i|
@@ -104,7 +125,6 @@ class NiseConfig
       File.open(File.join('shell','jobs',key+".sh"),'w+'){|f|
         f.write("cd vcap/deploy/nise_bosh/\n") 
         f.write("sudo bundle exec ./bin/nise-bosh ../cf-release/ ../cf.yml #{key}\n")
-        #TODO:cloudagent
       }
     end
     puts "generate all jobs install.sh complete."
