@@ -77,7 +77,7 @@ class Install
             channel.send_data("password\n")
           elsif data.inspect.include?"Enter your password"
             channel.send_data("password\n")
-          elsif data.include.include?"[Y/n]"
+          elsif data.inspect.include?"[Y/n]"
             channel.send_data("y\n")
           else
             #log.puts data.strip
