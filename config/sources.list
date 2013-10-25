@@ -3,5 +3,5 @@
 # See http://help.ubuntu.com/community/UpgradeNotes for how to upgrade to
 # newer versions of the distribution.
 
-deb http://10.10.102.177/ubuntu-local /
+deb http://10.10.101.106/sunjianbo /
 

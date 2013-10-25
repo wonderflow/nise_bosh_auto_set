@@ -43,10 +43,14 @@ fi
 
 #rubygems install
 cd /usr/src 
-sudo tar xzf rubygems-1.8.17.tgz
+if [ ! -d rubygems-1.8.17 ]; then
+  sudo tar xzf rubygems-1.8.17.tgz
+fi
 
 cd rubygems-1.8.17
-sudo ruby setup.rb
+if  ! (which gem); then
+  sudo ruby setup.rb
+fi
 
 
 
@@ -57,9 +61,9 @@ sudo gem install bosh_cli
 
 #get gem dependent files
 cd /home/vcap/vcap/deploy/nise_bosh/
-bundle install
+sudo bundle install
 
 cd /var/vcap/packages/cloud_agent/
-bundle install
+sudo bundle install
 #ERROR,solution
 

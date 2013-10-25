@@ -77,9 +77,9 @@ class NiseConfig
       if key == 'ccdb'
         cf['properties']['db'] = 'ccdb'
       end
-      ip[key].each_with_index do |ipp,index|
+      ip[key].each_with_index do |host,index|
         if cf['properties'].keys.inspect.include? key
-          cf['properties'][key]['address'] = ipp
+          cf['properties'][key]['address'] = host
         end
         output cf,'cfyml',key+"_"+index.to_s+"_cf"
       end
@@ -108,12 +108,12 @@ class NiseConfig
 
     ip.keys.each do |key|
       if key == 'domain' then next end
-      ip[key].each_with_index do |ipp,i|
+      ip[key].each_with_index do |host,index|
         cloudagent['mbus'] = "nats://nats:nats@"+nats+":4222"
         cloudagent['zkp_url'] = zkper+":2181"
         cloudagent['job'] = key
-        cloudagent['job_index'] = i
-        output cloudagent,'cloudagentyml',key+"_"+i.to_s+"_cloud"
+        cloudagent['job_index'] = index
+        output cloudagent,'cloudagentyml',key+"_"+index.to_s+"_cloud"
       end
     end
     puts "generate all jobs cloudagent.yml complete."
@@ -122,10 +122,20 @@ class NiseConfig
   def shell_generate(iptable)
     iptable.keys.each do |key|
       if key == 'domain' then next end
-      File.open(File.join('shell','jobs',key+".sh"),'w+'){|f|
-        f.write("cd vcap/deploy/nise_bosh/\n") 
-        f.write("sudo bundle exec ./bin/nise-bosh ../cf-release/ ../cf.yml #{key}\n")
-      }
+      iptable[key].each_with_index do |host,index|
+        filename = key+"_"+index.to_s
+        File.open(File.join('shell','jobs',filename+".sh"),'w+'){|f|
+          f.write("bash env.sh\n")
+          f.write("mv #{filename+'_cf.yml'} /home/vcap/vcap/deploy/cf.yml\n")
+          f.write("echo 'mv cf files'\n")
+          f.write("sudo mv #{filename+'_cloud.yml'} /var/vcap/jobs/cloud_agent/config/cloud_agent.yml\n")
+          f.write("echo 'mv cloud files'\n")
+          f.write("echo 'start exec autoinstall' ")
+          f.write("bash autoinstall.sh\n")
+          f.write("cd vcap/deploy/nise_bosh/\n") 
+          f.write("sudo bundle exec ./bin/nise-bosh ../cf-release/ ../cf.yml #{key}\n")
+        }
+      end
     end
     puts "generate all jobs install.sh complete."
   end

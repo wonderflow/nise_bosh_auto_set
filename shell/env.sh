@@ -7,11 +7,14 @@ fi
  
 #set blob files
 cd /home/vcap
-echo "\nstart to tar adeploy.gz. it may take time..."
-tar xzf adeploy.gz
 
-echo "move files"
-mkdir vcap
-mv  /home/vcap/adeploy/deploy /home/vcap/vcap/
-sudo mv  /home/vcap/adeploy/vcap /var
-rmdir adeploy
+if [ ! -d adeploy ]; then
+  echo "start to tar adeploy.gz. it may take time..."
+  tar xzf adeploy.gz
+
+  echo "move files finished "
+  mkdir vcap
+  mv  /home/vcap/adeploy/deploy /home/vcap/vcap/
+  sudo mv  /home/vcap/adeploy/vcap /var
+fi
+

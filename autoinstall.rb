@@ -26,6 +26,9 @@ class Install
   #send huge blobs with a proceed tar
   def send_blobs(ssh,srcpath,despath)
     if File.exist?srcpath
+      if ssh.exec("ls #{despath}")==despath
+        return "Blob File aready exists!"
+      end
       ssh.scp.upload!( srcpath , despath , :recursive => true )do|ch, name, sent, total|
         percent = (sent.to_f*100 / total.to_f).to_i
         if percent%5==0 
@@ -43,9 +46,10 @@ class Install
     files = []
     files << File.join('config','sources.list')
     files << File.join('shell','autoinstall.sh')
+    files << File.join('shell','env.sh')
     files << File.join('config','cfyml',@filename+"_cf.yml")
     files << File.join('config','cloudagentyml',@filename+"_cloud.yml")
-    files << File.join('shell','jobs',@job+".sh")
+    files << File.join('shell','jobs',@filename+".sh")
     blobs = []
     blobs << File.join('blobs','ruby-1.9.3-p448.tar.gz')
     blobs << File.join('blobs','rubygems-1.8.17.tgz')
@@ -65,6 +69,7 @@ class Install
     ssh.open_channel do |channel|
       channel.request_pty do |ch,success|
         raise "I can't get pty request " unless success
+        puts "exec: "+instructor
         ch.exec(instructor)
         ch.on_data do |ch,data|
           data.inspect
@@ -72,8 +77,11 @@ class Install
             channel.send_data("password\n")
           elsif data.inspect.include?"Enter your password"
             channel.send_data("password\n")
+          elsif data.include.include?"[Y/n]"
+            channel.send_data("y\n")
           else
-            log.puts data.strip
+            #log.puts data.strip
+            puts data.strip
           end
         end
       end
@@ -86,10 +94,6 @@ class Install
     Net::SSH.start(host,user,:password=>password) do |ssh|
       puts host+" connected."
       send_all ssh
-      exec ssh,log_file,"bash env.sh"
-      exec ssh,log_file,"mv #{@filename+'_cf.yml'} /home/vcap/vcap/deploy/cf.yml"
-      exec ssh,log_file,"sudo mv #{@filename+'_cloud.yml'} /var/vcap/jobs/cloud_agent/config/cloud_agent.yml"
-      exec ssh,log_file,"bash autoinstall.sh"
       exec ssh,log_file,"bash #{@filename+'.sh'}"
     end
     log_file.close
