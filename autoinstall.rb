@@ -26,7 +26,9 @@ class Install
   #send huge blobs with a proceed tar
   def send_blobs(ssh,srcpath,despath)
     if File.exist?srcpath
-      if ssh.exec("ls #{despath}")==despath
+      #puts srcpath.split('/').inspect+"  srcfile"
+      if ssh.exec("ls").inspect.include? srcpath.split('/')[-1]
+        # TODO : this block no use
         return "Blob File aready exists!"
       end
       ssh.scp.upload!( srcpath , despath , :recursive => true )do|ch, name, sent, total|
@@ -71,6 +73,8 @@ class Install
         raise "I can't get pty request " unless success
         puts "exec: "+instructor
         ch.exec(instructor)
+        # TODO : add exception solving code
+        # exception see pictures in Picture
         ch.on_data do |ch,data|
           data.inspect
           if data.inspect.include?"[sudo]" 
@@ -79,9 +83,11 @@ class Install
             channel.send_data("password\n")
           elsif data.inspect.include?"[Y/n]"
             channel.send_data("y\n")
+          elsif data.inspect.include?"[y/N]"
+            channel.send_data("y\n")
           else
-            #log.puts data.strip
-            puts data.strip
+            log.puts data.strip
+            #puts data.strip
           end
         end
       end

@@ -1,9 +1,9 @@
 ---
 nats:
-  - 10.10.102.163
+  - 10.10.102.161
 router: 
-  - 10.10.102.164
   - 10.10.102.165
+  - 10.10.102.166
 debian_nfs_server: 
   - 10.10.102.150
 syslog_aggregator: 
@@ -25,24 +25,26 @@ health_manager:
 dashboard:
   - 10.10.102.159
 opentsdb:
-  - 10.10.102.160
-stager:
-  - 10.10.102.161
   - 10.10.102.162
-dea:
-  - 10.10.102.166
+stager:
   - 10.10.102.167
-cloud_controller:
   - 10.10.102.168
+dea:
+  - 10.10.102.167
+  - 10.10.102.168
+cloud_controller:
   - 10.10.102.169
-hbase_master:
   - 10.10.102.170
+hbase_master:
+  - 10.10.102.172
 hbase_slave:
   - 10.10.102.171
 health_monitor:
-  - 10.10.102.172
+  - 10.10.102.160
 zkper:
-  - 10.10.102.173
+  - 10.10.102.163
+LB:
+  - 10.10.102.164
 domain:
-  - xxx.com
+  - bb.com
 

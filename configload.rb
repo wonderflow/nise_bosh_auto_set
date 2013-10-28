@@ -130,7 +130,7 @@ class NiseConfig
           f.write("echo 'mv cf files'\n")
           f.write("sudo mv #{filename+'_cloud.yml'} /var/vcap/jobs/cloud_agent/config/cloud_agent.yml\n")
           f.write("echo 'mv cloud files'\n")
-          f.write("echo 'start exec autoinstall' ")
+          f.write("echo 'start exec autoinstall'\n")
           f.write("bash autoinstall.sh\n")
           f.write("cd vcap/deploy/nise_bosh/\n") 
           f.write("sudo bundle exec ./bin/nise-bosh ../cf-release/ ../cf.yml #{key}\n")

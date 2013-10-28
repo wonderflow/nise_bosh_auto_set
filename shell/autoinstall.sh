@@ -2,16 +2,20 @@
 
 # !!! something important about permission!!!
 
-#Nise BOSH init
+#Nise BOSH init 
+echo '+sudo ./bin/init'
 cd /home/vcap/vcap/deploy/nise_bosh
 sudo ./bin/init
 
+echo '+install gcc'
 if [ ! `which gcc` ]; then
-  sudo DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install gcc
+  sudo DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install gcc
   #sudo DEBIAN_FRONTEND=noninteractive apt-get install -f -y --force-yes --no-install-recommends gcc
 fi
 
-sudo apt-get -y install build-essential libssl-dev libreadline5-dev zlib1g-dev libxslt-dev libxml2-dev git-core
+echo '+install other packages'
+
+sudo apt-get install build-essential libssl-dev libreadline5-dev zlib1g-dev libxslt-dev libxml2-dev git-core
 
 cd /home/vcap
 
