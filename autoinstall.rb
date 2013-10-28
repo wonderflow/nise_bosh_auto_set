@@ -27,9 +27,10 @@ class Install
   def send_blobs(ssh,srcpath,despath)
     if File.exist?srcpath
       #puts srcpath.split('/').inspect+"  srcfile"
-      if ssh.exec("ls").inspect.include? srcpath.split('/')[-1]
-        # TODO : this block no use
-        return "Blob File aready exists!"
+      #puts srcpath.split('/')[-1] + " src file"
+      #puts ssh.exec!("ls").inspect
+      if ssh.exec!("ls").inspect.include? srcpath.split('/')[-1]
+        return "Blob: #{srcpath} aready exists!"
       end
       ssh.scp.upload!( srcpath , despath , :recursive => true )do|ch, name, sent, total|
         percent = (sent.to_f*100 / total.to_f).to_i
@@ -76,7 +77,9 @@ class Install
         # TODO : add exception solving code
         # exception see pictures in Picture
         ch.on_data do |ch,data|
-          data.inspect
+          if data.inspect.include?"ERROR:"
+            return false
+          end
           if data.inspect.include?"[sudo]" 
             channel.send_data("password\n")
           elsif data.inspect.include?"Enter your password"
@@ -92,6 +95,7 @@ class Install
         end
       end
     end
+    return true
   end
 
   #connect remote vm and run logical things
@@ -100,7 +104,10 @@ class Install
     Net::SSH.start(host,user,:password=>password) do |ssh|
       puts host+" connected."
       send_all ssh
-      exec ssh,log_file,"bash #{@filename+'.sh'}"
+      result = false
+      begin
+       result = exec ssh,log_file,"bash #{@filename+'.sh'}"
+      end while result == false
     end
     log_file.close
   end 

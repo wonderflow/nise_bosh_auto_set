@@ -92,16 +92,18 @@ class NiseConfig
     # TODO: nats and zkper only have one and choose the first ip 
     #        write into the cloudagent yml
     if ip['nats'] == nil
-      puts "ERROR : you don't give nats config! "
+      #puts "ERROR : you don't give nats config! "
+      abort("ERROR : you don't give nats config!")
       # TODO : need to delete below line and error exit
-      nats = '10.10.102.150'
+      #nats = '10.10.102.150'
     else
       nats = ip['nats'][0].chomp
     end
     if ip['zkper'] == nil
-      puts "ERROR : you don't give zkper config! "
+      #puts "ERROR : you don't give zkper config! "
+      abort("ERROR : you don't give zkper config!")
       # TODO : need to delete below line and error exit
-      zkper = '10.10.102.150'
+      #zkper = '10.10.102.150'
     else
       zkper = ip['zkper'][0].chomp
     end
