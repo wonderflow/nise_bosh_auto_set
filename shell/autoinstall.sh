@@ -59,9 +59,9 @@ fi
 
 
 #install gem packages
-sudo gem install bundler
-sudo gem install rake
-sudo gem install bosh_cli
+sudo gem install --no-rdoc --no-ri bundler
+sudo gem install --no-rdoc --no-ri rake
+sudo gem install --no-rdoc --no-ri bosh_cli
 
 #get gem dependent files
 cd /home/vcap/vcap/deploy/nise_bosh/

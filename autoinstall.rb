@@ -12,6 +12,7 @@ class Install
     @password = password
 
     @filename = @job+"_"+@index.to_s
+    @error = []
   end
 
   def send_file(ssh,srcpath,despath)
@@ -78,7 +79,7 @@ class Install
         # exception see pictures in Picture
         ch.on_data do |ch,data|
           if data.inspect.include?"ERROR:"
-            return false
+            @error << data.inspect
           end
           if data.inspect.include?"[sudo]" 
             channel.send_data("password\n")
@@ -104,10 +105,11 @@ class Install
     Net::SSH.start(host,user,:password=>password) do |ssh|
       puts host+" connected."
       send_all ssh
-      result = false
       begin
-       result = exec ssh,log_file,"bash #{@filename+'.sh'}"
-      end while result == false
+        @error = []
+        if @error.size!=0;puts "error size is not zero!!";end
+        exec ssh,log_file,"bash #{@filename+'.sh'}"
+      end while @error.size != 0
     end
     log_file.close
   end 
