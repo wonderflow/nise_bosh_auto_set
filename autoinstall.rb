@@ -4,6 +4,8 @@ require 'net/scp'
 
 class Install
 
+  host_in_use = Hash.new
+
   def initialize(job,index,host,user,password)
     @job = job
     @index = index
@@ -109,16 +111,16 @@ class Install
       send_all ssh
       begin
         @error = []
-        if $host_in_use[@host] == nil
-          $host_in_use[@host] = @host+" now in use."
+        if self.host_in_use[@host] == nil
+          self.host_in_use[@host] = @host+" now in use."
           exec ssh,log_file,"bash #{@filename+'.sh'}"
           if @error.size!=0
             puts "ERROR OCCURS:"
           else
-            $host_in_use[@host] = nil
+            self.host_in_use[@host] = nil
           end
         else
-          @error << $host_in_use[@host]
+          @error << self.host_in_use[@host]
           sleep(2.minutes)
         end
         @error.each do |str|

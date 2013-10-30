@@ -11,7 +11,6 @@ installlist = []
 config = NiseConfig.new
 cf_yml = config.work
 
-$host_in_use = Hash.new
 
 cf_yml.keys.each do |key|
   if key=='domain' || key == 'LB' || key == 'zkper' then next end
