@@ -39,11 +39,11 @@ if [ ! -d ruby-1.9.3-p448 ]; then
 fi
 
 cd ruby-1.9.3-p448
-if ! (which ruby); then
-  sudo ./configure --prefix=/usr/local --enable-shared --disable-install-doc --with-opt-dir=/usr/local/lib --with-openssl-dir=/usr --with-readline-dir=/usr --with-zlib-dir=/usr
-  sudo make
-  sudo make install
-fi
+#if ! (which ruby); then
+sudo ./configure --prefix=/usr/local --enable-shared --disable-install-doc --with-opt-dir=/usr/local/lib --with-openssl-dir=/usr --with-readline-dir=/usr --with-zlib-dir=/usr
+sudo make
+sudo make install
+#fi
 
 #rubygems install
 cd /usr/src 
@@ -52,9 +52,9 @@ if [ ! -d rubygems-1.8.17 ]; then
 fi
 
 cd rubygems-1.8.17
-if  ! (which gem); then
-  sudo ruby setup.rb
-fi
+#if  ! (which gem); then
+sudo ruby setup.rb
+#fi
 
 
 

@@ -18,9 +18,9 @@ class Install
   def send_file(ssh,srcpath,despath)
     if File.exist?srcpath
       ssh.scp.upload!(srcpath,despath)
-      return "#{srcpath} upload Done."
+      puts "#{srcpath} upload Done."
     else
-      return "ERROR: Don't have such File: #{srcpath}"
+      abort("ERROR: Don't have such File: #{srcpath}")
     end
   end
 
@@ -31,7 +31,8 @@ class Install
       #puts srcpath.split('/')[-1] + " src file"
       #puts ssh.exec!("ls").inspect
       if ssh.exec!("ls").inspect.include? srcpath.split('/')[-1]
-        return "Blob: #{srcpath} aready exists!"
+        return
+        #return "Blob: #{srcpath} aready exists!"
       end
       ssh.scp.upload!( srcpath , despath , :recursive => true )do|ch, name, sent, total|
         percent = (sent.to_f*100 / total.to_f).to_i
@@ -40,9 +41,9 @@ class Install
         end
       end
       print "\n"
-      return "#{srcpath} upload Done."
+      puts "#{srcpath} upload Done."
     else
-      return "ERROR: Don't have such File: #{srcpath}"
+      abort("ERROR: Don't have such File: #{srcpath}")
     end
   end
 
@@ -61,11 +62,11 @@ class Install
     blobs << File.join('blobs','adeploy.gz')
     #send some files
     files.each do |f|
-      puts send_file(ssh,f,'.')
+      send_file(ssh,f,'.')
     end
     #send the important blob files
     blobs.each do |f|
-      puts send_blobs(ssh,f,'.')
+      send_blobs(ssh,f,'.')
     end
   end
 
@@ -78,8 +79,9 @@ class Install
         # TODO : add exception solving code
         # exception see pictures in Picture
         ch.on_data do |ch,data|
-          if data.inspect.include?"ERROR:"
-            @error << data.inspect
+          checkstr = data.inspect
+          if checkstr.include?"ERROR:" or checkstr.include?"error:" or checkstr.include?"Run `bundle install` to install missing gems."
+            @error << checkstr
           end
           if data.inspect.include?"[sudo]" 
             channel.send_data("password\n")
@@ -107,10 +109,24 @@ class Install
       send_all ssh
       begin
         @error = []
-        if @error.size!=0;puts "error size is not zero!!";end
-        exec ssh,log_file,"bash #{@filename+'.sh'}"
+        if $host_in_use[@host] == nil
+          $host_in_use[@host] = @host+" now in use."
+          exec ssh,log_file,"bash #{@filename+'.sh'}"
+          if @error.size!=0
+            puts "ERROR OCCURS:"
+          else
+            $host_in_use[@host] = nil
+          end
+        else
+          @error << $host_in_use[@host]
+          sleep(2.minutes)
+        end
+        @error.each do |str|
+          puts str
+        end
       end while @error.size != 0
     end
+    puts host+" Done!"
     log_file.close
   end 
 
