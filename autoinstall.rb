@@ -4,7 +4,7 @@ require 'net/scp'
 
 class Install
 
-  host_in_use = Hash.new
+  @@host_in_use = Hash.new
 
   def initialize(job,index,host,user,password)
     @job = job
@@ -15,12 +15,15 @@ class Install
 
     @filename = @job+"_"+@index.to_s
     @error = []
+    if @@host_in_use[host] == nil
+      @@host_in_use[host] = Mutex.new
+    end
   end
 
   def send_file(ssh,srcpath,despath)
     if File.exist?srcpath
       ssh.scp.upload!(srcpath,despath)
-      puts "#{srcpath} upload Done."
+      #puts "#{srcpath} upload Done."
     else
       abort("ERROR: Don't have such File: #{srcpath}")
     end
@@ -109,24 +112,20 @@ class Install
     Net::SSH.start(host,user,:password=>password) do |ssh|
       puts host+" connected."
       send_all ssh
-      begin
-        @error = []
-        if self.host_in_use[@host] == nil
-          self.host_in_use[@host] = @host+" now in use."
+      puts @host+"locked? "+@@host_in_use[@host].locked?.to_s
+      @@host_in_use[@host].synchronize do
+        puts @host+"in use"
+        begin
+          @error = []
           exec ssh,log_file,"bash #{@filename+'.sh'}"
           if @error.size!=0
             puts "ERROR OCCURS:"
-          else
-            self.host_in_use[@host] = nil
           end
-        else
-          @error << self.host_in_use[@host]
-          sleep(2.minutes)
-        end
-        @error.each do |str|
-          puts str
-        end
-      end while @error.size != 0
+          @error.each do |str|
+            puts str
+          end
+        end while @error.size != 0
+      end
     end
     puts host+" Done!"
     log_file.close

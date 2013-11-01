@@ -37,7 +37,7 @@ class NiseConfig
     c_ip = ['nats','ccdb','uaadb','vcap_redis','nfs_server',\
             'hbase_master','opentsdb','syslog_aggregator']
     c_ip.each do |str|
-      if ip[str] == nil
+      if ip[str] == nil && str != 'nfs_server'
         puts "warn : no component #{str}" 
         next
       end
@@ -71,11 +71,10 @@ class NiseConfig
     exchange cf,ip
     ip.keys.each do |key|
       if key == 'domain' then next end
-      if key == 'uaadb'
-        cf['properties']['db'] = 'uaadb'
-      end
-      if key == 'ccdb'
-        cf['properties']['db'] = 'ccdb'
+      if key == 'uaadb' || key == 'ccdb'
+        cf['properties']['db'] = key
+      else
+        cf['properties'].delete('db')
       end
       ip[key].each_with_index do |host,index|
         if cf['properties'].keys.inspect.include? key
@@ -93,9 +92,9 @@ class NiseConfig
     #        write into the cloudagent yml
     if ip['nats'] == nil
       #puts "ERROR : you don't give nats config! "
-      abort("ERROR : you don't give nats config!")
+      #abort("ERROR : you don't give nats config!")
       # TODO : need to delete below line and error exit
-      #nats = '10.10.102.150'
+      nats = '10.10.102.150'
     else
       nats = ip['nats'][0].chomp
     end
