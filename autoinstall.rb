@@ -6,6 +6,12 @@ class Install
 
   @@host_in_use = Hash.new
 
+  attr_accessor :job
+  attr_accessor :index
+  attr_accessor :host
+  attr_accessor :user
+  attr_accessor :password
+
   def initialize(job,index,host,user,password)
     @job = job
     @index = index
@@ -15,9 +21,6 @@ class Install
 
     @filename = @job+"_"+@index.to_s
     @error = []
-    if @@host_in_use[host] == nil
-      @@host_in_use[host] = Mutex.new
-    end
   end
 
   def send_file(ssh,srcpath,despath)
@@ -101,6 +104,9 @@ class Install
             #puts data.strip
           end
         end
+        ch.on_close do
+          #onclose do sth
+        end
       end
     end
     return true
@@ -112,27 +118,24 @@ class Install
     Net::SSH.start(host,user,:password=>password) do |ssh|
       puts host+" connected."
       send_all ssh
-      puts @host+"locked? "+@@host_in_use[@host].locked?.to_s
-      @@host_in_use[@host].synchronize do
-        puts @host+"in use"
-        begin
-          @error = []
-          exec ssh,log_file,"bash #{@filename+'.sh'}"
-          if @error.size!=0
-            puts "ERROR OCCURS:"
-          end
-          @error.each do |str|
-            puts str
-          end
-        end while @error.size != 0
-      end
+      begin
+        @error = []
+        exec ssh,log_file,"bash #{@filename+'.sh'}"
+        if @error.size!=0
+          puts "ERROR OCCURS:"
+        end
+        @error.each do |str|
+          puts str
+        end
+      end while @error.size != 0
     end
-    puts host+" Done!"
     log_file.close
   end 
 
   def work()
+    puts @host.capitalize+" "+@job+" start to work."
     remote_connect(@host,@user,@password)
+    puts @host.capitalize+" "+@job+" Done."
   end
 
 end

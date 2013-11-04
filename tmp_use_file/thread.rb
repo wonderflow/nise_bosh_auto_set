@@ -13,14 +13,14 @@ class Install
   end
 
   def work()
-    puts @url+" start."
     @@x[@url.to_sym].synchronize do
+    puts @url+" start."
     5.times do 
       puts @url+" ."
       sleep 1
     end
-    end
     puts @url+" end."
+    end
   end
 end
 

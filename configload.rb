@@ -44,6 +44,10 @@ class NiseConfig
       if str != 'nfs_server'
         cf['properties'][str]['address'] = ip[str][0]
       else
+        if ip['debian_nfs_server'] == nil
+          puts "warn : no debian_nfs_server!"
+          next
+        end
         network = ip['debian_nfs_server'][0]
         cf['properties'][str]['address'] = network
         cf['properties'][str]['network'] = network.sub(/\d+$/, '0/24')
@@ -92,9 +96,9 @@ class NiseConfig
     #        write into the cloudagent yml
     if ip['nats'] == nil
       #puts "ERROR : you don't give nats config! "
-      #abort("ERROR : you don't give nats config!")
+      abort("ERROR : you don't give nats config!")
       # TODO : need to delete below line and error exit
-      nats = '10.10.102.150'
+      #nats = '10.10.102.150'
     else
       nats = ip['nats'][0].chomp
     end
