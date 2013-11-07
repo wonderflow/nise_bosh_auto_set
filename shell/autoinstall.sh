@@ -72,5 +72,3 @@ sudo bundle install
 #ERROR,solution
 
 
-sudo /var/vcap/bosh/bin/monit
-sudo /var/vcap/bosh/bin/monit summary

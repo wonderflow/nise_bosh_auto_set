@@ -11,3 +11,4 @@ config/cfyml
 config/cloudagentyml
 shell/jobs
 *~
+blobs
