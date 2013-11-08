@@ -134,7 +134,7 @@ jobs:
 
 - name: ccdb
   template:
-  - ccdb_postgres
+  - postgres
 
 - name: backup_manager
   template:

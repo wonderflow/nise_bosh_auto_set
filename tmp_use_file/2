@@ -1,47 +1,10 @@
-#!/usr/bin/ruby
-require 'monitor'
 
-class Install
-  @@x = Hash.new
-
-  def initialize(url)
-    @url = url
-    if @@x[url] == nil
-      puts url
-      @@x[url.to_sym] = Mutex.new
-    end
-  end
-
-  def work()
-    puts @url+" start."
-    @@x[@url].synchronize do
-    5.times do 
-      puts @url+" ."
-      sleep 1
-    end
-    end
-    puts @url+" end."
-  end
-end
-
-thread = [] 
-job = []
-
-3.times do |i|
-  job << Install.new(i.to_s)
-end
-2.times do |i|
-  job << Install.new(i.to_s)
-end
+./configure --sbin-path=/usr/local/nginx/nginx \
+--conf-path=/usr/local/nginx/nginx.conf \
+--pid-path=/usr/local/nginx/nginx.pid \
+--with-http_ssl_module \
+--with-pcre=/usr/local/src/pcre-8.21 \
+--with-zlib=/usr/local/src/zlib-1.2.8 \
+--with-openssl=/usr/local/src/openssl-1.0.1c 
 
 
-
-job.each do |x|
-  thread << Thread.new do
-    x.work
-  end
-end
-
-thread.each do |s|
-  s.join
-end

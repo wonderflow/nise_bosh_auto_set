@@ -12,11 +12,11 @@ class Status
     return YAML::load_file(@file)
   end
 
-  def exec(ssh,instructor)
+  def exec(ssh,ins)
     ssh.open_channel do |channel|
       channel.request_pty do |ch,success|
         raise "I can't get pty request " unless success
-        ch.exec(instructor)
+        ch.exec(ins)
         ch.on_data do |ch,data|
           if data.inspect.include?"[sudo]"; channel.send_data("password\n")
           else ; puts data.strip ; end
@@ -28,8 +28,16 @@ class Status
   def connect(host,user,password)
     Net::SSH.start(host,user,:password=>password) do |ssh|
       puts "Examing "+host
-      exec(ssh,"sudo /var/vcap/bosh/bin/monit")
-      exec(ssh,"sudo /var/vcap/bosh/bin/monit summary")
+      ins = []
+      #ins << "sudo /var/vcap/bosh/bin/monit "
+      ins << "sudo /var/vcap/bosh/bin/monit summary"
+
+      #ins << "cat /proc/cpuinfo | grep 'processor'|sort|uniq |wc -l"
+      #ins << "cat /proc/meminfo | grep MemTotal |awk '{print $2}'"
+      #ins << "df -Ph / | head -3 |tail -1 |awk '{print $1}'"
+      ins.each do |i|
+        exec(ssh,i)
+      end
       puts host+"Examined"
     end
   end
@@ -38,7 +46,7 @@ class Status
     @ip_yml_table.keys.each do |key|
       if key=='domain';next;end
       @ip_yml_table[key].each do |host|
-        puts "Job: "+key
+        puts "Job: "+key+" "+host
         `ssh-keygen -f "/home/sun/.ssh/known_hosts" -R #{host}`
         connect(host,"vcap","password")
       end

@@ -139,8 +139,8 @@ class NiseConfig
           f.write("bash autoinstall.sh\n")
           f.write("cd vcap/deploy/nise_bosh/\n") 
           f.write("sudo bundle exec ./bin/nise-bosh ../cf-release/ ../cf.yml #{key}\n")
-          f.write("sudo /var/vcap/bosh/bin/monit")
-          f.write("sudo /var/vcap/bosh/bin/monit summary")
+          f.write("sudo /var/vcap/bosh/bin/monit\n")
+          f.write("sudo /var/vcap/bosh/bin/monit summary\n")
         }
       end
     end

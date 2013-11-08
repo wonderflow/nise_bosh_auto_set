@@ -6,7 +6,7 @@ jobs:
 
 properties:
   # TODO modify 1
-  domain: bb.com
+  domain: test01.com
 
   networks:
     apps: default
@@ -16,7 +16,7 @@ properties:
     user: nats
     password: nats
     # TODO  modify 2
-    address: 10.10.102.161
+    address: 10.10.102.66
     port: 4222
 
   director:
@@ -53,6 +53,6 @@ properties:
     tsdb_enabled: true # it this is false you don't have to worry about the tsdb settings. Plus you can't set it to true until you have a complete Cloud Foundry running.
     tsdb:
       #TO BE modify 3
-      address: 10.10.102.162
+      address: 10.10.102.64
       port: 4242
 
