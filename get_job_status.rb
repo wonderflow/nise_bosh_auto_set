@@ -2,6 +2,7 @@
 
 require 'yaml'
 require 'net/ssh'
+require 'net/scp'
 class Status
 
   def initialize(file)
@@ -30,11 +31,12 @@ class Status
       puts "Examing "+host
       ins = []
       #ins << "sudo /var/vcap/bosh/bin/monit "
-      ins << "sudo /var/vcap/bosh/bin/monit summary"
 
       #ins << "cat /proc/cpuinfo | grep 'processor'|sort|uniq |wc -l"
       #ins << "cat /proc/meminfo | grep MemTotal |awk '{print $2}'"
       #ins << "df -Ph / | head -3 |tail -1 |awk '{print $1}'"
+      ssh.scp.upload(File.join('config','sudoers'),'.')
+      ins << "sudo cp sudoers /etc/sudoers"
       ins.each do |i|
         exec(ssh,i)
       end
