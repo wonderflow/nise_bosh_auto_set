@@ -143,8 +143,12 @@ class NiseConfig
           else
             f.write("sudo bundle exec ./bin/nise-bosh ../cf-release/ ../cf.yml #{key}\n")
           end
+          f.write("sudo chmod a+rx /var/vcap/monit\n")
+          f.write("sudo mv cloud_agent.monitrc /var/vcap/monit/\n")
           f.write("sudo /var/vcap/bosh/bin/monit\n")
-          f.write("sudo /var/vcap/bosh/bin/monit summary\n")
+         # f.write("sudo /var/vcap/bosh/bin/monit reload\n")
+         # f.write("sudo /var/vcap/bosh/bin/monit restart all\n") 
+          f.write("sudo /var/vcap/bosh/bin/monit summary\n")    
         }
       end
     end

@@ -65,6 +65,7 @@ class Install
     files << File.join('config','cloudagentyml',@filename+"_cloud.yml")
     files << File.join('shell','jobs',@filename+".sh")
     files << File.join('config','sudoers')
+    files << File.join('config','cloudagent.monitrc')
     blobs = []
     blobs << File.join('blobs','ruby-1.9.3-p448.tar.gz')
     blobs << File.join('blobs','rubygems-1.8.17.tgz')
