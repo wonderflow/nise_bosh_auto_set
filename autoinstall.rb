@@ -21,6 +21,7 @@ class Install
 
     @filename = @job+"_"+@index.to_s
     @error = []
+    #@running = true
   end
 
   def send_file(ssh,srcpath,despath)
@@ -63,6 +64,7 @@ class Install
     files << File.join('config','cfyml',@filename+"_cf.yml")
     files << File.join('config','cloudagentyml',@filename+"_cloud.yml")
     files << File.join('shell','jobs',@filename+".sh")
+    files << File.join('config','sudoers')
     blobs = []
     blobs << File.join('blobs','ruby-1.9.3-p448.tar.gz')
     blobs << File.join('blobs','rubygems-1.8.17.tgz')
@@ -105,7 +107,7 @@ class Install
           end
         end
         ch.on_close do
-          #onclose do sth
+          #@running = false
         end
       end
     end
@@ -115,20 +117,20 @@ class Install
   #connect remote vm and run logical things
   def remote_connect(host,user,password)
     log_file = File.open(File.join("log",host+".log"),"w+")
-    Net::SSH.start(host,user,:password=>password) do |ssh|
-      puts host+" connected."
-      send_all ssh
-      begin
-        @error = []
+    begin
+      @error = []
+      Net::SSH.start(host,user,:password=>password) do |ssh|
+        puts host+" connected."
+        send_all ssh
         exec ssh,log_file,"bash #{@filename+'.sh'}"
-        if @error.size!=0
-          puts "ERROR OCCURS:"
-        end
-        @error.each do |str|
-          puts str
-        end
-      end while @error.size != 0
-    end
+      end
+      if @error.size!=0
+        puts "ERROR OCCURS:"
+      end
+      @error.each do |str|
+        puts str
+      end
+    end while @error.size != 0
     log_file.close
   end 
 

@@ -138,7 +138,11 @@ class NiseConfig
           f.write("echo 'start exec autoinstall'\n")
           f.write("bash autoinstall.sh\n")
           f.write("cd vcap/deploy/nise_bosh/\n") 
-          f.write("sudo bundle exec ./bin/nise-bosh ../cf-release/ ../cf.yml #{key}\n")
+          if key == 'health_monitor'
+            f.write("sudo bundle exec ./bin/nise-bosh ../bosh-release/ ../health_monitor.yml #{key}\n")
+          else
+            f.write("sudo bundle exec ./bin/nise-bosh ../cf-release/ ../cf.yml #{key}\n")
+          end
           f.write("sudo /var/vcap/bosh/bin/monit\n")
           f.write("sudo /var/vcap/bosh/bin/monit summary\n")
         }

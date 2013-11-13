@@ -4,7 +4,14 @@ if [ `ls | grep sources.list` ]; then
   sudo apt-get update
   rm sources.list
 fi
- 
+
+# add monit
+echo "alias monit=\"sudo /var/vcap/bosh/bin/monit\"" >> .bashrc
+source .bashrc
+
+# mv sudoers to /etc/sudoers
+sudo mv sudoers /etc/sudoers
+
 #set blob files
 cd /home/vcap
 

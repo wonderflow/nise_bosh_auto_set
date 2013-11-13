@@ -7,6 +7,7 @@ class Status
 
   def initialize(file)
     @file = file
+    @x = true
   end
 
   def load_yml()
@@ -22,6 +23,9 @@ class Status
           if data.inspect.include?"[sudo]"; channel.send_data("password\n")
           else ; puts data.strip ; end
         end
+        ch.on_close do
+          @x = false
+        end
       end
     end
   end
@@ -29,15 +33,16 @@ class Status
   def connect(host,user,password)
     Net::SSH.start(host,user,:password=>password) do |ssh|
       puts "Examing "+host
+      ssh.scp.upload(File.join('config','cloud_agent.monitrc'),'.')
       ins = []
       #ins << "sudo /var/vcap/bosh/bin/monit "
+      ins << "sudo chmod a+rx /var/vcap/monit ; \
+              sudo mv cloud_agent.monitrc /var/vcap/monit/ ;\
+              sudo /var/vcap/bosh/bin/monit reload ; \
+              sudo /var/vcap/bosh/bin/monit restart all ; \
+              sudo /var/vcap/bosh/bin/monit summary
+             "
 
-      #ins << "cat /proc/cpuinfo | grep 'processor'|sort|uniq |wc -l"
-      #ins << "cat /proc/meminfo | grep MemTotal |awk '{print $2}'"
-      #ins << "df -Ph / | head -3 |tail -1 |awk '{print $1}'"
-      #ssh.scp.upload(File.join('config','sudoers'),'.')
-      #puts ssh.exec!("cp bashrc.bak .bashrc")
-      puts ssh.exec('echo "alias monit=\"sudo /var/vcap/bosh/bin/monit\"" >> .bashrc')
       ins.each do |i|
         exec(ssh,i)
       end
@@ -62,4 +67,4 @@ class Status
   end
 end
 
-Status.new(File.join('config','iptable.yml')).work
+Status.new(File.join('backup','iptable.yml')).work

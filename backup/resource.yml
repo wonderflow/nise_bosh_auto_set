@@ -21,7 +21,6 @@ small:
     - nats
     - hbase_master
     - hbase_slave
-    - LB
 middle:
   - 2
   - 4
@@ -39,3 +38,4 @@ large:
     - ESBnats
     - ESB
     - WSO2
+    - LB
