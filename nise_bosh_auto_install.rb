@@ -4,7 +4,7 @@ $:.unshift File.dirname(__FILE__)
 
 require 'configload'
 require 'autoinstall'
-
+require 'checkvm'
 
 threads = []
 install_list = []
@@ -12,6 +12,12 @@ config = NiseConfig.new
 ip_resource = Hash.new
 cf_yml = config.work
 
+check = Check.new(config.load_yml(File.join('config','resource.yml')),cf_yml)
+check.work
+
+if check.OK == false
+  abort("VM resource is not Enough. Check the VM config or change the resource.yml.")
+end
 
 cf_yml.keys.each do |key|
   if key=='domain' || key == 'LB' || key == 'zkper' then next end
