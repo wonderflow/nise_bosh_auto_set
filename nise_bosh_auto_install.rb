@@ -23,6 +23,7 @@ cf_yml.keys.each do |key|
   if key=='domain' || key == 'LB' || key == 'zkper' then next end
   cf_yml[key].each_with_index do |host,index|
     puts host
+    `ssh-keygen -f "/home/sun/.ssh/known_hosts" -R #{host}`
     install_list << Install.new(key,index,host,'vcap','password')
   end
 end

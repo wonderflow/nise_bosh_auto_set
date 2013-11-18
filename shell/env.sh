@@ -5,9 +5,6 @@ if [ `ls | grep sources.list` ]; then
   rm sources.list
 fi
 
-# add monit
-echo "alias monit=\"sudo /var/vcap/bosh/bin/monit\"" >> .bashrc
-source .bashrc
 
 # mv sudoers to /etc/sudoers
 sudo mv sudoers /etc/sudoers
@@ -23,5 +20,12 @@ if [ ! -d adeploy ]; then
   mkdir vcap
   mv  /home/vcap/adeploy/deploy /home/vcap/vcap/
   sudo mv  /home/vcap/adeploy/vcap /var
+
+  # add monit
+  # TODO:add only once required,put it here for convenice
+  echo "alias monit=\"sudo /var/vcap/bosh/bin/monit\"" >> ~/.bashrc
+  source ~/.bashrc
 fi
 
+cd /home/vcap
+mv health_monitor.yml /home/vcap/vcap/deploy/
