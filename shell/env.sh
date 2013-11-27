@@ -7,7 +7,6 @@ fi
 
 
 # mv sudoers to /etc/sudoers
-sudo mv sudoers /etc/sudoers
 
 #set blob files
 cd /home/vcap

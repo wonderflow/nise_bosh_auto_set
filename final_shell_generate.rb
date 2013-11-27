@@ -16,6 +16,7 @@ class FinalShell
           f.write("echo 'mv cloud files'\n")
           f.write("echo 'start exec autoinstall'\n")
           f.write("bash autoinstall.sh\n")
+          f.write("sudo mv cloud_agent.monitrc /var/vcap/monit/\n")
           f.write("cd vcap/deploy/nise_bosh/\n") 
           if key == 'health_monitor'
             f.write("sudo bundle exec ./bin/nise-bosh ../bosh-release/ ../health_monitor.yml #{key}\n")
@@ -23,7 +24,6 @@ class FinalShell
             f.write("sudo bundle exec ./bin/nise-bosh ../cf-release/ ../cf.yml #{key}\n")
           end
           f.write("sudo chmod a+rx /var/vcap/monit\n")
-          f.write("sudo mv cloud_agent.monitrc /var/vcap/monit/\n")
           f.write("sudo /var/vcap/bosh/bin/monit\n")
          # f.write("sudo /var/vcap/bosh/bin/monit reload\n")
          # f.write("sudo /var/vcap/bosh/bin/monit restart all\n") 

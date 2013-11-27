@@ -33,16 +33,18 @@ class Status
   def connect(host,user,password)
     Net::SSH.start(host,user,:password=>password) do |ssh|
       puts "Examing "+host
-      ssh.scp.upload(File.join('config','cloud_agent.monitrc'),'.')
+      #ssh.scp.upload(File.join('config','cloud_agent.monitrc'),'.')
       ins = []
       #ins << "sudo /var/vcap/bosh/bin/monit "
+      ins << "sudo /var/vcap/bosh/bin/monit summary"
+=begin
       ins << "sudo chmod a+rx /var/vcap/monit ; \
               sudo mv cloud_agent.monitrc /var/vcap/monit/ ;\
               sudo /var/vcap/bosh/bin/monit reload ; \
               sudo /var/vcap/bosh/bin/monit restart all ; \
               sudo /var/vcap/bosh/bin/monit summary
              "
-
+=end
       ins.each do |i|
         exec(ssh,i)
       end
@@ -67,4 +69,4 @@ class Status
   end
 end
 
-Status.new(File.join('backup','iptable.yml')).work
+Status.new(File.join('config','iptable.yml')).work

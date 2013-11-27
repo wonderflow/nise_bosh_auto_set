@@ -19,4 +19,5 @@ root    ALL=(ALL) ALL
 
 # Members of the admin group may gain root privileges
 %admin ALL=(ALL) ALL
+%sudo ALL=(ALL:ALL) ALL
 #includedir /etc/sudoers.d

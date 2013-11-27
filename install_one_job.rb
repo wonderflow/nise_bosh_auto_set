@@ -27,7 +27,7 @@ class Install
   def send_file(ssh,srcpath,despath)
     if File.exist?srcpath
       ssh.scp.upload!(srcpath,despath)
-      #puts "#{srcpath} upload Done."
+      puts "#{srcpath} upload Done."
     else
       abort("ERROR: Don't have such File: #{srcpath}")
     end
@@ -64,7 +64,6 @@ class Install
     files << File.join('config','cfyml',@filename+"_cf.yml")
     files << File.join('config','cloudagentyml',@filename+"_cloud.yml")
     files << File.join('shell','jobs',@filename+".sh")
-    #files << File.join('config','sudoers')
     files << File.join('config','cloud_agent.monitrc')
     files << File.join('config','health_monitor.yml')
     blobs = []
@@ -82,7 +81,7 @@ class Install
     end
   end
 
-  def exec(ssh,log,instructor)
+  def exec(ssh,instructor)
     ssh.open_channel do |channel|
       channel.request_pty do |ch,success|
         raise "I can't get pty request " unless success
@@ -104,7 +103,7 @@ class Install
           elsif data.inspect.include?"[y/N]"
             channel.send_data("y\n")
           else
-            log.puts data.strip
+            puts data.strip
             #puts data.strip
           end
         end
@@ -117,22 +116,20 @@ class Install
   end
 
   def send_as_root(host,user,password)
+    
     Net::SSH.start(host,'root',:password=>'123456') do |ssh|
       ssh.scp.upload!(File.join('config','sudoers'),'.')
-      ssh.exec!('mv sudoers /etc/sudoers')
     end
   end
 
   #connect remote vm and run logical things
   def remote_connect(host,user,password)
-    log_file = File.open(File.join("log",host+".log"),"w+")
     begin
-      send_as_root(host,user,password)
       @error = []
       Net::SSH.start(host,user,:password=>password) do |ssh|
         puts host+" connected."
         send_all ssh
-        exec ssh,log_file,"bash #{@filename+'.sh'}"
+        exec ssh,"bash #{@filename+'.sh'}"
       end
       if @error.size!=0
         puts "ERROR OCCURS:"
@@ -141,7 +138,6 @@ class Install
         puts str
       end
     end while @error.size != 0
-    log_file.close
   end 
 
   def work()
@@ -151,3 +147,7 @@ class Install
   end
 
 end
+
+ix = Install.new('debian_nfs_server',0,'115.238.92.127','vcap','password')
+
+ix.work

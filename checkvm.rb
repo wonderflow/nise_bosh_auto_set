@@ -46,6 +46,7 @@ class Check
       if key == 'domain'; next;end
       cpu,memsize,disksize = getlimit(key)
       @ip_file[key].each do |host|
+        `ssh-keygen -f "/home/sun/.ssh/known_hosts" -R #{host}`
         thread << Thread.new do 
           connect(host,'vcap','password')
           #puts "#{host} checked."
